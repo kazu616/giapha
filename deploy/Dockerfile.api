@@ -1,6 +1,6 @@
 FROM rust:1-bookworm AS build
 WORKDIR /src
-COPY apps/api /src
+COPY backend /src
 RUN cargo build --release
 
 FROM debian:bookworm-slim
@@ -8,7 +8,7 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 COPY --from=build /src/target/release/giapha-api /usr/local/bin/giapha-api
-COPY apps/api/assets /assets
+COPY backend/assets /assets
 ENV ASSETS_DIR=/assets
 EXPOSE 8080
 CMD ["giapha-api"]

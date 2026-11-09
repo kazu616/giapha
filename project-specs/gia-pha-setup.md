@@ -4,11 +4,28 @@ Phạm vi bám spec Excel và ứng dụng tĩnh hiện có. Không làm phục 
 
 ## Tầng
 
-1. Trình bày: React + Vite + TypeScript + Ant Design, thư mục `apps/web`.
-2. Nghiệp vụ: Rust (Axum, SQLx), thư mục `apps/api`.
+1. Frontend: React + Vite + TypeScript + Ant Design, thư mục `frontend/`.
+2. Backend: Rust (Axum, SQLx), thư mục `backend/`, xếp theo DDD.
 3. Dữ liệu: PostgreSQL 16, Docker Compose trong `deploy/`.
 
-Ứng dụng tĩnh ở gốc (`index.html`, `js/`, `css/`) giữ nguyên.
+Ứng dụng tĩnh ở gốc (`index.html`, `js/`, `css/`) là bản phả đồ cũ, tách khỏi sản phẩm.
+
+### Frontend
+
+- `src/domain`: mô hình người, họ, xưng hô và cách dựng cây.
+- `src/application`: phiên đăng nhập.
+- `src/infrastructure`: gọi HTTP tới backend.
+- `src/presentation`: trang và bố cục.
+
+### Backend
+
+Phụ thuộc đi một chiều: interface → application → domain ← infrastructure.
+
+- `src/domain`: thực thể, quy tắc xưng hô, cổng repository. Không có SQL hay HTTP.
+- `src/application`: ca sử dụng đăng ký, đăng nhập, phả đồ, tin tức, sự kiện.
+- `src/infrastructure`: PostgreSQL, argon2, JWT, seed.
+- `src/interfaces/http`: Axum, chỉ đổi request/response.
+- `src/main.rs`: composition root, nối các lớp.
 
 ## Chức năng đi cùng phả đồ
 
@@ -42,7 +59,7 @@ Tiền tố không có `/api` trên tiến trình Rust. Cổng 8080. Web nginx c
 
 `graph` là `mau` hoặc `lien`. `region` là `bac`, `trung`, `nam`. `prefer` là `gan`, `noi`, `ngoai`.
 
-Khi khởi động, nếu chưa có dữ liệu thì nạp `apps/api/assets/*.json` và tạo `admin@giapha.local` / `Admin@12345` vai trò admin.
+Khi khởi động, nếu chưa có dữ liệu thì nạp `backend/assets/*.json` và tạo `admin@giapha.local` / `Admin@12345` vai trò admin.
 
 ## Kiểm thử bắt buộc
 
