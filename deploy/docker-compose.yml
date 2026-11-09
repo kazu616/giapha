@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: giapha
+      POSTGRES_PASSWORD: giapha
+      POSTGRES_DB: giapha
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U giapha -d giapha"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - giapha-pg:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.api
+    environment:
+      DATABASE_URL: postgres://giapha:giapha@db:5432/giapha
+      JWT_SECRET: giapha-dev-secret-change-me
+      ASSETS_DIR: /assets
+      BIND: 0.0.0.0:8080
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+
+  web:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.web
+    depends_on:
+      - api
+    ports:
+      - "8088:80"
+
+volumes:
+  giapha-pg:

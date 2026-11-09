@@ -1,0 +1,23 @@
+[package]
+name = "giapha-api"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Gia phả API — một tiến trình Axum"
+
+[dependencies]
+anyhow = "1"
+argon2 = "0.5"
+axum = "0.7"
+chrono = { version = "0.4", features = ["serde"] }
+jsonwebtoken = "9"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# `macros` bật sqlx::query / query_as / migrate! lúc biên dịch, không cần DATABASE_URL.
+sqlx = { version = "0.8", default-features = false, features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono", "migrate", "macros"] }
+thiserror = "1"
+tokio = { version = "1", features = ["full"] }
+tower-http = { version = "0.5", features = ["cors", "trace"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+uuid = { version = "1", features = ["v4", "serde"] }

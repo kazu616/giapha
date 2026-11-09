@@ -1,0 +1,1 @@
+{"clan":{"name":"Dòng họ Nguyễn","subtitle":"Gia phả mẫu phụ hệ","model":"ID, giới tính, ID cha, thứ tự con. Đời = đời cha + 1. Con của con gái thuộc họ ngoại, không nằm trong cây này."},"thresholds":{"nguPhuc":4,"rutGon":6}}

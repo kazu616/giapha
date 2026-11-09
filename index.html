@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gia phả dòng họ Nguyễn — xưng hô theo vai vế</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="#pha-do" data-view="tree">
+        <span class="seal" aria-hidden="true">阮</span>
+        <span>
+          <strong>Gia phả</strong>
+          <small>Dòng họ Nguyễn</small>
+        </span>
+      </a>
+      <nav class="nav" aria-label="Mục chính">
+        <button type="button" data-view="tree">Phả đồ</button>
+        <button type="button" data-view="lien">Liên họ</button>
+        <button type="button" data-view="address">Xưng hô</button>
+        <button type="button" data-view="members">Thành viên</button>
+        <button type="button" data-view="rules">Quy tắc</button>
+        <button type="button" data-view="region">Vùng miền</button>
+      </nav>
+      <div class="header-tools">
+        <label class="field">Bạn là
+          <select id="ego"></select>
+        </label>
+        <label class="field">Miền
+          <select id="region">
+            <option value="bac">Bắc</option>
+            <option value="trung">Trung</option>
+            <option value="nam">Nam</option>
+          </select>
+        </label>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="eyebrow">Vai vế theo đời, không theo tuổi</div>
+      <h1>Gọi đúng người, kể cả khi cách nhau nhiều đời.</h1>
+      <p class="lead">Cây phụ hệ mẫu của dòng họ Nguyễn. Hai người bất kỳ được đối chiếu qua tổ chung gần nhất, rồi tính số đời và nhánh lớn nhỏ để ra cách xưng hô.</p>
+      <div class="stats" id="stats"></div>
+    </section>
+    <div id="view"></div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap" id="foot"></div>
+  </footer>
+
+  <div id="drawer-back" class="drawer-back hidden"></div>
+  <aside id="drawer" class="drawer hidden" aria-label="Hồ sơ thành viên"></aside>
+
+  <script src="js/data.js"></script>
+  <script src="js/kinship.js"></script>
+  <script src="js/lienho-data.js"></script>
+  <script src="js/lienho.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

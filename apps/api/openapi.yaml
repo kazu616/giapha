@@ -1,0 +1,372 @@
+openapi: 3.0.3
+info:
+  title: Gia phả API
+  version: 0.1.0
+  description: |
+    Một tiến trình Axum. Nginx bỏ tiền tố /api trước khi chuyển vào đây.
+    Lỗi luôn là {"error":"..."}. JWT HS256, hạn 7 ngày, claim sub là id người dùng.
+servers:
+  - url: http://localhost:8080
+paths:
+  /health:
+    get:
+      operationId: health
+      responses:
+        "200":
+          description: Sống
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok]
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+  /auth/register:
+    post:
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, name]
+              properties:
+                email: { type: string }
+                password: { type: string, minLength: 8, maxLength: 128 }
+                name: { type: string }
+      responses:
+        "201":
+          description: Đã tạo thành viên
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          $ref: "#/components/responses/Error"
+        "409":
+          $ref: "#/components/responses/Error"
+  /auth/login:
+    post:
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string }
+                password: { type: string }
+      responses:
+        "200":
+          description: Đăng nhập
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          $ref: "#/components/responses/Error"
+  /auth/me:
+    get:
+      operationId: me
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Hồ sơ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          $ref: "#/components/responses/Error"
+    patch:
+      operationId: patchMe
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string }
+      responses:
+        "200":
+          description: Hồ sơ sau khi đổi tên
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/Error"
+        "401":
+          $ref: "#/components/responses/Error"
+  /clans:
+    get:
+      operationId: listClans
+      responses:
+        "200":
+          description: Dòng họ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Clan"
+  /people:
+    get:
+      operationId: listPeople
+      parameters:
+        - name: clan
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Thành viên của một dòng họ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Person"
+        "404":
+          $ref: "#/components/responses/Error"
+  /kinship:
+    post:
+      operationId: kinship
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [fromId, toId, graph]
+              properties:
+                fromId: { type: string }
+                toId: { type: string }
+                region:
+                  type: string
+                  enum: [bac, trung, nam]
+                  default: bac
+                graph:
+                  type: string
+                  enum: [mau, lien]
+                prefer:
+                  type: string
+                  enum: [gan, noi, ngoai]
+                  default: gan
+      responses:
+        "200":
+          description: Cách xưng hô. Không có tổ chung thì kind là none.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Kinship"
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
+  /news:
+    get:
+      operationId: listNews
+      responses:
+        "200":
+          description: Tin tức công khai
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/News"
+    post:
+      operationId: createNews
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, body]
+              properties:
+                title: { type: string }
+                body: { type: string }
+      responses:
+        "201":
+          description: Đã tạo. Cần vai trò editor hoặc admin.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/News"
+        "401":
+          $ref: "#/components/responses/Error"
+        "403":
+          $ref: "#/components/responses/Error"
+  /events:
+    get:
+      operationId: listEvents
+      responses:
+        "200":
+          description: Sự kiện công khai
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Event"
+    post:
+      operationId: createEvent
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, kind, eventDate, place, body]
+              properties:
+                title: { type: string }
+                kind: { type: string }
+                eventDate: { type: string, format: date }
+                place: { type: string }
+                body: { type: string }
+      responses:
+        "201":
+          description: Đã tạo. Cần vai trò editor hoặc admin.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        "400":
+          $ref: "#/components/responses/Error"
+        "401":
+          $ref: "#/components/responses/Error"
+        "403":
+          $ref: "#/components/responses/Error"
+  /rules:
+    get:
+      operationId: getRule
+      parameters:
+        - name: a
+          in: query
+          required: true
+          schema: { type: integer }
+        - name: b
+          in: query
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Quy tắc mẫu theo khóa a-b, kèm a và b
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [a, b]
+                properties:
+                  a: { type: integer }
+                  b: { type: integer }
+                  type: { type: string }
+                  scope: { type: string }
+                  tone: { type: string }
+                  han: { type: string }
+                  lcaX: { type: string }
+                  lcaY: { type: string }
+        "404":
+          $ref: "#/components/responses/Error"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    Error:
+      description: Lỗi
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [error]
+            properties:
+              error: { type: string }
+  schemas:
+    User:
+      type: object
+      required: [id, email, name, role]
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string }
+        name: { type: string }
+        role:
+          type: string
+          enum: [member, editor, admin]
+    AuthResponse:
+      type: object
+      required: [token, user]
+      properties:
+        token: { type: string }
+        user:
+          $ref: "#/components/schemas/User"
+    Clan:
+      type: object
+      required: [id, name, kind]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        kind: { type: string }
+    Person:
+      type: object
+      required: [id, clanId, name, gender, note]
+      properties:
+        id: { type: string }
+        clanId: { type: string }
+        name: { type: string }
+        gender: { type: string }
+        fatherId: { type: string, nullable: true }
+        motherId: { type: string, nullable: true }
+        spouseId: { type: string, nullable: true }
+        order: { type: integer, nullable: true }
+        generation: { type: integer, nullable: true }
+        note: { type: string }
+    Kinship:
+      type: object
+      required: [term, kind]
+      properties:
+        term: { type: string, nullable: true }
+        termGoc: { type: string, nullable: true }
+        reverseTerm: { type: string, nullable: true }
+        side: { type: string, nullable: true }
+        kind: { type: string }
+        a: { type: integer, nullable: true }
+        b: { type: integer, nullable: true }
+        ancestorId: { type: string, nullable: true }
+    News:
+      type: object
+      required: [id, title, body, authorId, publishedAt]
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string }
+        body: { type: string }
+        authorId: { type: string, format: uuid }
+        publishedAt: { type: string, format: date-time }
+    Event:
+      type: object
+      required: [id, title, kind, eventDate, place, body]
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string }
+        kind: { type: string }
+        eventDate: { type: string, format: date }
+        place: { type: string }
+        body: { type: string }

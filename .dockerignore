@@ -1,0 +1,4 @@
+apps/api/target
+apps/web/node_modules
+.git
+**/*.xlsx
